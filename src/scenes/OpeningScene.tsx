@@ -1,9 +1,10 @@
 import { useRef } from 'react'
-import { LineReveal } from '../components/LineReveal'
+import { Beats, LineReveal } from '../components/LineReveal'
 import { copy } from '../content/copy'
 import { useSceneAnimation, type SceneSetup } from '../hooks/useSceneAnimation'
 import { gsap } from '../lib/gsap'
 import { playLineReveal, trackVisibility } from '../lib/sceneTweens'
+import { registerStop } from '../lib/stops'
 
 /** Soft out-of-focus lights, as if through a wet windshield. Positions are art-directed, not random. */
 const BOKEH = [
@@ -16,7 +17,7 @@ const BOKEH = [
   { x: '6%', y: '88%', size: 'md', tone: 'warm' },
 ] as const
 
-const animateOpening: SceneSetup = ({ scope, el, all }) => {
+const animateOpening: SceneSetup = ({ scope, el, all, onCleanup }) => {
   trackVisibility(scope)
   const intro = el('.opening__intro')
 
@@ -43,6 +44,15 @@ const animateOpening: SceneSetup = ({ scope, el, all }) => {
   // …and the story takes its place.
   const story = el('.opening__story')
   playLineReveal(all('.opening__story [data-reveal]'), story, 'top 80%')
+
+  // FR-100: the first two stops — the framing, then the story centred in the viewport.
+  onCleanup(registerStop('opening', () => 0))
+  onCleanup(
+    registerStop('opening-story', () => {
+      const box = story.getBoundingClientRect()
+      return box.top + window.scrollY + box.height / 2 - window.innerHeight / 2
+    }),
+  )
 }
 
 export function OpeningScene() {
@@ -75,18 +85,19 @@ export function OpeningScene() {
             className="mt-5 max-w-[22ch] font-serif text-humour italic text-rain-50"
           />
         </div>
+        {/* FR-013, FR-077–FR-078: which line shows depends on <html data-audio> (set by AudioControl). */}
         <p className="scroll-cue">
+          <span className="scroll-cue__texts">
+            <span className="scroll-cue__text scroll-cue__text--hint">{copy.opening.cue.hint}</span>
+            <span className="scroll-cue__text scroll-cue__text--after">{copy.opening.cue.afterPlay}</span>
+            <span className="scroll-cue__text scroll-cue__text--plain">{copy.opening.cue.plain}</span>
+          </span>
           <span className="scroll-cue__line" aria-hidden="true" />
-          <span className="font-sans text-label font-semibold uppercase">{copy.opening.cue}</span>
         </p>
       </div>
 
       <div className="opening__story">
-        <LineReveal
-          as="h2"
-          lines={copy.opening.story}
-          className="font-serif text-display font-normal text-rain-50"
-        />
+        <Beats beats={copy.opening.story} className="font-serif text-display font-normal text-rain-50" />
       </div>
     </section>
   )

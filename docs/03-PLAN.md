@@ -4,7 +4,7 @@
 |---|---|
 | **Phase** | 4 of the HTD workflow (Plan) |
 | **Status** | Approved. The owner gave blanket approval on 2026-11-21 ("approved all from my side"). |
-| **Based on** | [01-FSD.md](01-FSD.md) v1.0 · [02-SCOPE.md](02-SCOPE.md) v1.0 |
+| **Based on** | [01-FSD.md](01-FSD.md) v1.1 · [02-SCOPE.md](02-SCOPE.md) v1.1. Section H covers CR-02 (approved with defaults). |
 
 ---
 
@@ -46,7 +46,7 @@ index.html ─ main.tsx ─ <ErrorBoundary fallback={<StaticStory/>}>
 | **GSAP + ScrollTrigger** | ✅ Use | The industry standard for scrubbed, held scroll storytelling. Handles iOS address-bar resizing (`ignoreMobileResize`), refreshes on resize, `matchMedia` for reduced motion, and cleans up with `context`. Free licence, including commercial use. ~45 KB gz together. |
 | Motion (Framer Motion) | ❌ | Overlaps with GSAP. Weaker at holding scenes in place and orchestrating scrubbed timelines. Would add ~35 KB for no gain. |
 | Native CSS scroll-driven animations (`animation-timeline`) | ❌ for now | Not in Safari 16/17, and iOS is the primary target. |
-| CSS scroll snap / FullPage.js | ❌ | Forces a pace on scrolling, which goes against FR-002. |
+| CSS scroll snap / FullPage.js | ❌ | CSS snap can't step through pinned, scrubbed scenes; fullPage.js needs a licence, adds ~40 KB and fights ScrollTrigger. Stepping uses GSAP Observer (already inside ScrollTrigger), AD-10. |
 | Lenis | ❌ | Native scrolling plus scrubbing (`scrub: 1`) already smooths visuals. Lenis would intercept touch scrolling on iOS (an a11y and hijacking concern) and adds a library. |
 | Three.js / WebGL | ❌ | A CSS-gradient pearl gives the look we want for ~0 KB. Three would add ~150 KB, GPU cost on phones and a WebGL fallback path. |
 | Particle library (tsParticles etc.) | ❌ | ~60+ KB for what fits in ~150 lines of canvas code. |
@@ -129,3 +129,14 @@ priti_to_preet/
 | Project name | **`an-unusual-collaboration`** (D-04) |
 
 **Final verification checklist:** the build passes, `dist/` contains only the files we use, "Priti" appears exactly once, there are no third-party requests, the response headers are present, and nothing appears in the console. Then a full scroll on the deployed URL, on a phone.
+
+## H. CR-02: Story pacing, section stepping and the music hint
+
+| # | Decision | Why |
+|---|---|---|
+| AD-9 | **Beats.** `copy.ts` holds each scene's text as `beats: string[][]` (paragraphs of lines). A `Beats` component renders one heading with a block per beat. Static CSS stacks the beats as paragraphs (the final, readable state). Inside the animation setup the block gets `.is-sequenced`, which overlays the beats in one grid cell, and `addBeats()` adds to the scene timeline, per beat: lines rise in (0.6 units, staggered), a label `beat-i` in the middle of a 0.6-unit hold, then the lines lift out (0.4 units) as the next beat rises. | One beat at a time (FR-063); reverts to stacked paragraphs under reduced motion or failure (FR-066). |
+| AD-10 | **Stops and stepping.** `lib/stops.ts` is a registry of named stops, each a function returning a scroll Y, so positions are always read fresh after a refresh. Scenes register their stops in their setup (opening: top and story; held scenes: one per beat label, `y = start + (end − start) · label / duration`; message: the letter). `lib/sectionScroll.ts` uses `ScrollTrigger.observe` (wheel and touch, `preventDefault`, ignoring Ctrl+wheel and multi-touch) plus a keydown handler. A step tweens a proxy and calls `window.scrollTo` (`power2.inOut`, 0.9 s + 0.35 s per viewport, clamped to 1.0–2.2 s). Input during a step is ignored, and a gesture only counts if it starts after ≥ 160 ms without input (momentum guard). `App` installs it inside `gsap.matchMedia('(prefers-reduced-motion: no-preference)')`. | fullPage.js-style stepping with no new dependency; scrubbed timelines still drive every scene. Stateless (it reads the scroll position), so native scrolling never confuses it (FR-104). |
+| AD-11 | **Pin length from the timeline.** `pinnedTimeline()` builds the timeline first, then attaches the pin with `end: duration × 0.4 × innerHeight`. | Adding a beat in `copy.ts` re-paces the scene (D-12). |
+| AD-12 | **Music hint.** `AudioControl` mirrors its state onto `<html data-audio>` and keeps `data-hint="on"` until the first scroll past 10% of the viewport. The opening cue holds three texts (hint / after play / unavailable); CSS shows the right one from `data-audio`. The pulse is a CSS ring (transform + opacity) on the button while the hint is on and nothing has played. | No shared React state between distant components; the visual state is pure CSS and static under reduced motion. |
+
+**Files touched:** `content/copy.ts`, `components/LineReveal.tsx` (adds `Beats`), `components/StaticStory.tsx`, `components/AudioControl.tsx`, `hooks/useSceneAnimation.ts` (adds `onCleanup`), `lib/sceneTweens.ts`, new `lib/stops.ts` and `lib/sectionScroll.ts`, `lib/testHooks.ts` (exposes the stops), every scene, `App.tsx`, `styles/*.css`, the tests.

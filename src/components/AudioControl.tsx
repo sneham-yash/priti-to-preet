@@ -30,6 +30,24 @@ export function AudioControl() {
 
   const playing = state === 'playing'
 
+  /** FR-077–FR-079: the hint and pulse belong to the opening; they leave with the first scroll. */
+  const [hint, setHint] = useState(true)
+  useEffect(() => {
+    if (!hint) return
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.1) setHint(false)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [hint])
+
+  // AD-12: the opening's cue reads the audio state from <html data-audio>.
+  useEffect(() => {
+    document.documentElement.dataset.audio = state
+  }, [state])
+  useEffect(() => () => void delete document.documentElement.dataset.audio, [])
+
   useEffect(() => {
     if (state !== 'error') return
     const timer = window.setTimeout(() => setState('gone'), ERROR_VISIBLE_MS)
@@ -89,7 +107,7 @@ export function AudioControl() {
   const label = state === 'error' ? copy.audio.unavailable : playing ? copy.audio.pause : copy.audio.play
 
   return (
-    <div className="audio-control" data-state={state}>
+    <div className="audio-control" data-state={state} data-hint={hint ? 'on' : 'off'}>
       <audio
         ref={audioRef}
         src={TRACK_SRC}

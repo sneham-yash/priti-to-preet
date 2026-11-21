@@ -15,6 +15,7 @@ declare global {
       atmosphere: () => Record<string, number>
       particles: Record<string, number>
       particleLoopRunning: boolean
+      stops?: () => { id: string; y: number }[]
     }
   }
 }

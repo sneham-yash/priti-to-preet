@@ -38,7 +38,7 @@ test.describe('Reduced motion, failure and privacy', () => {
     await openStory(page, '/?__fail=1')
     await expect(page.locator('.static-story')).toBeVisible()
     await expect(page.locator('.static-story')).toContainText('if you’d like that too.')
-    await expect(page.locator('.static-story')).toContainText('Only the light on the snow.')
+    await expect(page.locator('.static-story')).toContainText('into an ordinary morning.')
   })
 
   test('TC-130 no third-party requests, cookies or storage [NFR-030, NFR-031]', async ({ page, context, baseURL }) => {

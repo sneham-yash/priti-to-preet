@@ -8,6 +8,7 @@ import {
   scrollToMessage,
   scrollToPin,
   scrollToY,
+  stopY,
   walkPage,
 } from './helpers'
 
@@ -38,7 +39,8 @@ test.describe('Scroll storytelling', () => {
     const sunStart = await opacity(page, '.mountain__sun')
     await scrollToPin(page, 0, 1)
     expect(await opacity(page, '.mountain__sun')).toBeGreaterThan(sunStart + 0.5)
-    expect(visible(await allOpacities(page, '.mountain__text [data-reveal]'))).toBe(true)
+    // FR-064: the last beat is what remains at the end of the hold.
+    expect(visible(await allOpacities(page, '.mountain__text [data-beat="2"] [data-reveal]'))).toBe(true)
   })
 
   test('TC-021 mountain image motion stays within limits [FR-021]', async ({ page }) => {
@@ -71,12 +73,10 @@ test.describe('Scroll storytelling', () => {
   test('TC-033/035 the pearl is discovered, then the words [FR-033, FR-035]', async ({ page }) => {
     await scrollToPin(page, 1, 0)
     expect(await opacity(page, '.pearl')).toBeLessThanOrEqual(0.15)
-    await scrollToPin(page, 1, 0.4)
     expect(Math.max(...(await allOpacities(page, '.pearl__text [data-reveal]')))).toBeLessThan(0.1)
-    await scrollToPin(page, 1, 0.7)
+    await scrollToY(page, Math.round(await stopY(page, 'pearl-0')))
     expect(await opacity(page, '.pearl')).toBeGreaterThanOrEqual(0.95)
-    await scrollToPin(page, 1, 1)
-    expect(visible(await allOpacities(page, '.pearl__text [data-reveal]'))).toBe(true)
+    expect(visible(await allOpacities(page, '.pearl__text [data-beat="0"] [data-reveal]'))).toBe(true)
   })
 
   test('TC-034 ambient loops pause off-screen [FR-034]', async ({ page }) => {
@@ -92,13 +92,13 @@ test.describe('Scroll storytelling', () => {
       })
     await scrollToPin(page, 2, 0)
     expect(await right()).toBeGreaterThanOrEqual(99.9)
-    await scrollToPin(page, 2, 0.35)
+    await scrollToPin(page, 2, 0.12)
     const mid = await right()
     expect(mid).toBeGreaterThan(0)
     expect(mid).toBeLessThan(100)
     await scrollToPin(page, 2, 1)
     expect(await right()).toBe(0)
-    expect(visible(await allOpacities(page, '.oasis__text [data-reveal]'))).toBe(true)
+    expect(visible(await allOpacities(page, '.oasis__text [data-beat="1"] [data-reveal]'))).toBe(true)
   })
 
   test('TC-050/125 effects stop before the message; the loop goes idle [FR-050, NFR-006]', async ({ page }) => {

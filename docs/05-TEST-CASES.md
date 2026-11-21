@@ -18,8 +18,8 @@
 | ID | Req | Scenario | Steps | Expected | Method | Priority |
 |---|---|---|---|---|---|---|
 | TC-001 | FR-001 | Section structure | Load `/`; query `main > section` | Exactly 5 sections, ids in order: opening, mountain, pearl, oasis, message. No `nav`, `header` or `footer` | A | P1 |
-| TC-002 | FR-002 | No scroll hijacking | Scan CSS and JS for `scroll-snap-type`. Run `window.scrollTo(0, 3000)` | No snap rules. The scroll position is honoured exactly | A | P1 |
-| TC-003 | FR-003 | Pin budget | Read `ScrollTrigger.getAll()` | ≤ 3 pinned triggers, each with a distance ≤ 1.5 × viewport height | A | P1 |
+| TC-002 | FR-002 | Programmatic scroll honoured, no CSS snap | Scan CSS for `scroll-snap-type`. Run `window.scrollTo(0, 3000)` | No snap rules. The scroll position is honoured exactly | A | P1 |
+| TC-003 | FR-003 | Pin budget | Read `ScrollTrigger.getAll()` | ≤ 3 pinned triggers, each with a distance ≤ 2.5 × viewport height | A | P1 |
 | TC-004 | FR-004 | Reverse scrolling | Scroll to the bottom in steps, then back to the top in steps; screenshot the top | The top matches the initial screenshot. Opening text is visible | A | P1 |
 | TC-005 | FR-005 | Resize | At 1440 × 900, scroll to the pearl; resize to 390 × 844 | Pearl section visible. No horizontal overflow. Pins still valid | A | P2 |
 | TC-010 | FR-010 | Opening atmosphere | Load; screenshot | Rain canvas present, fog and bokeh elements present, no image request for the opening | A+V | P2 |
@@ -89,3 +89,28 @@
 | TC-142 | NFR-010 | Real iPhone, Safari | Smooth full scroll; audio plays; no jumps from the address bar | D | P1 |
 | TC-143 | NFR-010 | Real Android phone, Chrome | Same as TC-142 | D | P1 |
 | TC-144 | NFR-010 | Desktop Safari | Same | D | P2 |
+
+## CR-02: pacing, stepping and the music hint
+
+| ID | Req | Scenario | Steps | Expected | Method | Priority |
+|---|---|---|---|---|---|---|
+| TC-150 | FR-100 | Stop list | Read the probe's stops | 11 stops in order: opening, opening-story, mountain-0..2, pearl-0..2, oasis-0..1, message; increasing positions | A | P1 |
+| TC-151 | FR-002, FR-101 | Wheel steps forward through the whole story | From the top, one wheel gesture at a time | Each gesture lands on the next stop (±2 px), in order, ending at the message; each step settles within 2.6 s | A | P1 |
+| TC-152 | FR-002 | Wheel steps back | From the message, one gesture up | Lands on the previous stop | A | P1 |
+| TC-153 | FR-102 | Momentum guard | 10 wheel events 16 ms apart | Exactly one stop moved | A | P1 |
+| TC-154 | FR-103 | Keyboard | ArrowDown, PageDown, Space, ArrowUp, Shift+Space, End, Home | One stop each; End → message; Home → top | A | P1 |
+| TC-155 | FR-103 | Space on the audio button | Tab to the button, press Space | Music toggles; the page doesn't move | A | P1 |
+| TC-156 | FR-104 | Native scroll respected | `scrollTo` between two stops; wait; one forward gesture | Not snapped while idle; lands on the first stop below | A | P1 |
+| TC-157 | FR-105 | Ends | Gesture up at the top; gesture down at the message | Position unchanged | A | P2 |
+| TC-158 | FR-106 | Reduced motion | Emulate reduce; one wheel notch | Native scroll (moves by the wheel delta, not to a stop) | A | P1 |
+| TC-159 | FR-002 | Browser zoom | Ctrl+wheel | Not intercepted (event not prevented) | A | P2 |
+| TC-160 | FR-063, FR-064 | One beat at a time | Visit each beat stop | That beat's lines ≥ 0.95; other beats' lines ≤ 0.05 | A | P1 |
+| TC-161 | FR-066 | Reduced motion: beats stacked | Emulate reduce | All lines opacity 1; beats in one scene don't overlap | A | P1 |
+| TC-162 | FR-067 | Beat size and overflow | Every beat stop at 320 and 1440 px | No horizontal overflow; screenshots for review | A+V | P2 |
+| TC-163 | FR-035, FR-043 | Text after the visuals | Pearl and oasis just before their first beat | Pearl opacity ≥ 0.95 / oasis fully revealed before any text shows | A | P1 |
+| TC-170 | FR-077 | Music hint at load | Load | "Psst… press play first" visible; the control has `data-hint="on"` and a pulse animation | A | P1 |
+| TC-171 | FR-078 | After play | Click play | Hint hidden; "Lovely. Now, scroll slowly." visible; pulse stopped | A | P1 |
+| TC-172 | FR-079 | Hint leaves with the first step | One step down, then back to the top | Cue opacity < 0.1 both times; `data-hint="off"` | A | P1 |
+| TC-173 | FR-079 | Reduced motion | Emulate reduce | The pulse has no animation | A | P2 |
+| TC-174 | FR-077 | Hint layout | 320, 390, 1440 px at the top | The hint doesn't overlap the control or the framing text | A | P1 |
+| TC-175 | FR-002 | Touch swipe on a real phone | Swipe up and down through the story | One stop per swipe, smooth, no double steps | D | P1 |

@@ -80,3 +80,44 @@ export async function walkPage(page: Page, settle = 250): Promise<void> {
   const step = await page.evaluate(() => innerHeight * 0.8)
   for (let y = 0; y <= total + step; y += step) await scrollToY(page, Math.min(y, total), settle)
 }
+
+export interface Stop {
+  id: string
+  y: number
+}
+
+/** CR-02 stops, as registered by the scenes (FR-100). */
+export async function stops(page: Page): Promise<Stop[]> {
+  return page.evaluate(() => window.__probe?.stops?.() ?? [])
+}
+
+export async function stopY(page: Page, id: string): Promise<number> {
+  const stop = (await stops(page)).find((s) => s.id === id)
+  expect(stop, `stop ${id} exists`).toBeTruthy()
+  return stop?.y ?? 0
+}
+
+/** Waits until the page has stopped moving (a step has finished). */
+export async function settled(page: Page, quietMs = 350, timeout = 6000): Promise<number> {
+  const start = Date.now()
+  let last = await page.evaluate(() => window.scrollY)
+  let quietSince = Date.now()
+  while (Date.now() - start < timeout) {
+    await page.waitForTimeout(50)
+    const y = await page.evaluate(() => window.scrollY)
+    if (Math.abs(y - last) > 0.5) {
+      last = y
+      quietSince = Date.now()
+    } else if (Date.now() - quietSince >= quietMs) return y
+  }
+  return last
+}
+
+/** One wheel gesture (a single notch), then wait for the step to finish. */
+export async function wheelStep(page: Page, direction: 1 | -1): Promise<number> {
+  const vp = page.viewportSize()
+  await page.mouse.move((vp?.width ?? 400) / 2, (vp?.height ?? 800) / 2)
+  await page.mouse.wheel(0, 120 * direction)
+  await page.waitForTimeout(120)
+  return settled(page)
+}

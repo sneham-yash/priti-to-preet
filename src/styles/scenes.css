@@ -55,6 +55,24 @@
   text-wrap: balance;
 }
 
+/*
+ * FR-063/FR-066 (AD-9): beats. Statically they stack as paragraphs (the readable final state).
+ * A scene's animation setup adds .is-sequenced, which overlays them so one shows at a time.
+ */
+.beat {
+  display: block;
+}
+.beat + .beat {
+  margin-top: 0.6em;
+}
+.beats.is-sequenced {
+  display: grid;
+}
+.beats.is-sequenced > .beat {
+  grid-area: 1 / 1;
+  margin-top: 0;
+}
+
 /* Ambient loops run only near the viewport (AD-8). */
 .bokeh,
 .fog,
@@ -217,32 +235,82 @@
   justify-content: flex-end;
   padding: 0 var(--gutter) calc(15svh + env(safe-area-inset-bottom));
 }
+/*
+ * FR-013 + FR-077–FR-079: the cue sits on the same row as the audio control and points at it.
+ * Which line shows is driven by <html data-audio> (AD-12); no attribute = not yet played.
+ */
 .scroll-cue {
   position: absolute;
   left: var(--gutter);
-  bottom: calc(4.5svh + env(safe-area-inset-bottom));
+  right: calc(16px + 48px + 14px + env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  min-height: 48px;
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  justify-content: flex-end;
+  gap: 0.75rem;
   margin: 0;
-  color: var(--color-rain-200);
+  color: var(--color-rain-50);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.3rem);
+  line-height: 1.2;
+  text-align: right;
 }
+.scroll-cue__texts {
+  display: grid;
+}
+.scroll-cue__text {
+  grid-area: 1 / 1;
+  justify-self: end;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.6s var(--ease-gentle),
+    visibility 0s linear 0.6s;
+}
+:root:not([data-audio]) .scroll-cue__text--hint,
+[data-audio='idle'] .scroll-cue__text--hint,
+[data-audio='playing'] .scroll-cue__text--after,
+[data-audio='paused'] .scroll-cue__text--after,
+[data-audio='error'] .scroll-cue__text--plain,
+[data-audio='gone'] .scroll-cue__text--plain {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+/* The pointer: a hairline with an arrowhead, nudging toward the control. */
 .scroll-cue__line {
+  position: relative;
+  flex: none;
   display: block;
-  width: 2.5rem;
+  width: 2.75rem;
   height: 1px;
   background: currentColor;
-  transform-origin: left center;
-  animation: cue-breathe 3.4s ease-in-out infinite alternate;
+  animation: cue-point 1.6s ease-in-out infinite alternate;
+  transition: opacity 0.6s var(--ease-gentle);
 }
-@keyframes cue-breathe {
+.scroll-cue__line::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+:root[data-audio]:not([data-audio='idle']) .scroll-cue__line {
+  opacity: 0;
+}
+/* Transform only, so the opacity rule above can hide the pointer once the music plays. */
+@keyframes cue-point {
   from {
-    transform: scaleX(0.35);
-    opacity: 0.6;
+    transform: translate3d(-6px, 0, 0);
   }
   to {
-    transform: scaleX(1);
-    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 .opening__story {
@@ -438,6 +506,10 @@
   right: 0;
   text-align: center;
 }
+/* Beats of different lengths grow upward from the same baseline, away from the pearl. */
+.pearl__text .beats.is-sequenced > .beat {
+  align-self: end;
+}
 
 /* ── 4 · Oasis ──────────────────────────────────────────────────────────── */
 .approach--to-desert {
@@ -558,6 +630,7 @@
   opacity: 0.5;
 }
 .audio-control__button {
+  position: relative;
   display: grid;
   place-items: center;
   width: 48px;
@@ -575,6 +648,30 @@
 }
 .audio-control__button:disabled {
   cursor: default;
+}
+/* FR-077–FR-079: a soft ring breathes out of the control while the music hint is showing. */
+.audio-control__button::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid rgb(233 238 242 / 0.75);
+  opacity: 0;
+  pointer-events: none;
+}
+.audio-control[data-state='idle'][data-hint='on'] .audio-control__button::before {
+  animation: audio-pulse 2.4s var(--ease-gentle) infinite;
+}
+@keyframes audio-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 .audio-bars {
   display: flex;
@@ -634,9 +731,6 @@
   .opening__intro {
     padding-bottom: 18svh;
   }
-  .scroll-cue {
-    left: 8vw;
-  }
   .stage__text {
     padding-inline: 8vw;
   }
@@ -646,8 +740,12 @@
     padding-inline: 0 6vw;
   }
   .oasis__text {
-    top: 9svh;
+    top: 6svh;
     right: auto;
+  }
+  /* The oasis has a five-line beat: keep it in the sky, above the palms. */
+  .oasis__text .beats {
+    font-size: min(var(--text-beat), 2.5rem);
   }
   .pearl__text {
     bottom: 7svh;
@@ -660,7 +758,8 @@
   .fog,
   .ocean__rays,
   .scroll-cue__line,
-  .audio-bars span {
+  .audio-bars span,
+  .audio-control__button::before {
     animation: none !important;
   }
   .opening__rain-still {

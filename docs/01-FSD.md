@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Phase** | 2 of the HTD workflow (FSD) |
-| **Status** | **Approved** by the owner, 2026-11-21. The copy picks (§J 1–3) are still open; see Scope OI-01. The fonts (§J 4) were approved as part of UX-001. |
-| **Version** | 1.0 · 2026-11-21 |
+| **Status** | **Approved** by the owner, 2026-11-21. v1.1 (CR-02) approved with the defaults in §K, as the owner delegated. The copy picks (§J 1–3) are still open; see Scope OI-01. The fonts (§J 4) were approved as part of UX-001. |
+| **Version** | 1.1 · 2026-11-21 (change request CR-02, see §K) |
 | **Inputs** | Project brief; Discovery decisions D-01 to D-06; resolved questions Q-04 to Q-15 |
 
 How to read this:
@@ -50,8 +50,8 @@ At any point she can play or pause the music with one control. She can scroll ba
 | ID | Requirement | Acceptance criterion |
 |---|---|---|
 | FR-001 | One page at `/` with exactly five sections in this fixed order: Opening, Mountain, Pearl, Oasis, Message. | The DOM contains exactly 5 `<section>` elements inside `<main>`, in that order. No other content sections, nav, header or footer exist. |
-| FR-002 | Scrolling is native vertical scrolling. No scroll snap, no scroll hijacking, no wheel or touch interception. | Mouse wheel, trackpad, touch fling, keyboard (Space, PgDn, arrows) and scrollbar dragging all move the page at native speed. A code search finds no `preventDefault` on wheel/touch/scroll events and no `scroll-snap-type`. |
-| FR-003 | Each metaphor scene (Mountain, Pearl, Oasis) holds in place **at most once**, for no more than about 1.5 viewport heights of scrolling. Opening and Message are never held. | ScrollTrigger config has ≤ 3 pinned triggers, each with a pin distance ≤ 150% of viewport height. |
+| FR-002 | **Section stepping (CR-02, like fullPage.js).** With motion enabled, one wheel or trackpad gesture, one touch swipe, or one key press moves the page to the next or previous **stop** (FR-100) in a single eased scroll. The scrollbar, programmatic scrolling, find-in-page and assistive technology still scroll natively and are never pulled back. With reduced motion, scrolling is fully native. | One wheel gesture from any stop lands on the next stop (±2 px). `window.scrollTo(0, 3000)` is honoured exactly. No CSS `scroll-snap-type`. Ctrl+wheel (browser zoom) is never intercepted. Under reduced motion, one wheel notch moves the page natively. |
+| FR-003 | Each metaphor scene (Mountain, Pearl, Oasis) holds in place **at most once**. The hold is as long as its visual sequence plus one stop per text beat (FR-063), and no more than 2.5 viewport heights of scroll distance. Opening and Message are never held. | ScrollTrigger config has ≤ 3 pinned triggers, each with a pin distance ≤ 250% of viewport height. |
 | FR-004 | Every scroll-linked animation reverses when she scrolls up. No animation "locks" after playing once. | Scrolling from the bottom back to the top returns each scene to its initial visual state, with no missing or stuck elements. |
 | FR-005 | On resize or orientation change, scene layout and triggers recalculate without breaking. | Rotating a phone (portrait ↔ landscape) mid-scene and resizing a desktop window from 1440 to 375 px both leave every scene correctly positioned, with no gaps, overlaps or stuck pins. |
 
@@ -62,7 +62,7 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-010 | A full-viewport opening with a rainy, misty atmosphere built in code: fine rain streaks, slowly drifting fog and a few soft, out-of-focus warm lights (like streetlights through a wet windshield). No photo is needed. | The first viewport shows visible rain, fog and soft lights on a slate palette, with no image request made for the opening. |
 | FR-011 | The collaboration framing is visible on first paint: the heading "Collaboration Proposal" plus one dry humorous line (copy §F.7). | Both are visible without scrolling at 320 × 568 and above, and readable within 1 s on a fast connection. |
 | FR-012 | The personal intent becomes clear on the first scroll. Within one viewport of scrolling, the humorous line fades out and the story line appears, line by line. | After scrolling ≤ 100% of viewport height, the story line is fully visible and the humorous line is hidden. |
-| FR-013 | A minimal scroll cue (a hairline and/or a two-word text hint) invites her to scroll and fades out after her first scroll. | The cue is visible at load and hidden once the scroll position exceeds 10% of viewport height. It does not come back on scrolling up. |
+| FR-013 | A minimal scroll cue, combined with the music hint (FR-077), sits at the bottom of the opening and fades out after her first scroll or step. | The cue is visible at load and hidden once the scroll position exceeds 10% of viewport height. It does not come back on scrolling up. |
 | FR-014 | No brand imitation: no Hopper logo, app UI, notification mock-up, times, route or workplace details. | Visual and code review finds none of these elements. |
 
 ### C.3 Mountain
@@ -73,7 +73,7 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-021 | The mountain image enters gently from the right (≤ 6% horizontal travel), revealed through mist. Scale stays ≤ 1.06 at the start and settles to 1.0. | Measured transform values never exceed translateX 6% or scale 1.06. |
 | FR-022 | Sunlight changes subtly: a warm-gold light (#E8C98A) on the summit grows as she scrolls through the scene. | The warm overlay opacity goes from about 0 to its target over the held part of the scene and reverses on scrolling up. |
 | FR-023 | Gentle snowfall: sparse, slow, soft particles. | ≤ 60 particles on mobile and ≤ 120 on desktop. Fall speed reads as slow and drifting, never storm-like. |
-| FR-024 | The scene's line (copy §F.7) is revealed line by line over the sky area of the image. | The text is fully visible by the end of the hold, sits over sky rather than over busy rock, and meets the contrast rule (NFR-020). |
+| FR-024 | The scene's text (copy §F.7) is revealed in beats (FR-063) over the sky area of the image. | Each beat is fully visible at its stop, sits over sky rather than over busy rock, and meets the contrast rule (NFR-020). |
 
 ### C.4 Pearl
 
@@ -84,7 +84,7 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-032 | **The pearl is built in code** (no image): pearl-white body (#E8EEF1), a soft specular highlight, a very subtle iridescent edge and a soft halo. It is realistic and restrained, never cartoonish. | It renders as a single luminous sphere with no outline stroke, no purple tint, no drop-shadow "sticker" look and no shell. Its diameter is 18–28 vmin, capped at 180 px. |
 | FR-033 | **Discovery sequence**, driven by scrolling: (1) the darkness deepens, (2) a light shaft narrows toward the pearl, (3) the pearl goes from nearly invisible to luminous and its halo grows, (4) the lustre highlight shifts slightly as she scrolls, as if it is turning in the light. | At the start of the hold the pearl's opacity is ≤ 0.15. By about 70% through the hold it is at full opacity with its halo visible. The sequence reverses on scrolling up. |
 | FR-034 | The light rays move subtly: a slow, looping shimmer that is not tied to scrolling. | The loop period is ≥ 8 s with a low-amplitude opacity change. It pauses when the scene is off-screen. |
-| FR-035 | The scene's line (copy §F.7) appears after the pearl is lit, in pearl white. | The text only becomes visible once the pearl is past 70% of its sequence. |
+| FR-035 | The scene's text (copy §F.7) appears in beats (FR-063) after the pearl is lit, in pearl white. | No text is visible before the pearl reaches full opacity. |
 
 ### C.5 Oasis
 
@@ -93,7 +93,7 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-040 | **Transition from the pearl:** the scene surfaces. Midnight lightens through teal into warm sand (#D8BD91), as if rising into sunlight. | Continuous colour interpolation with no hard cut. |
 | FR-041 | **Horizontal mask reveal:** the desert and oasis are revealed left to right as she scrolls, like eyes scanning a horizon. *If you supply the matched pair (desert with and without the oasis), the empty desert is the base and the oasis version is revealed over it, so the oasis "appears" in the empty sand.* | Clip-path or mask moves from fully hidden to fully revealed across the hold and reverses on scrolling up. It works with one image or with the matched pair. |
 | FR-042 | Warm light sweeps subtly across the sand while the reveal runs, and a very small number of warm motes drift. | Motes ≤ 30 on mobile. The light sweep only changes opacity or position, never adds blur. |
-| FR-043 | The scene's line (copy §F.7) appears once the oasis is visible. | The text only becomes visible once the reveal is past 60%. |
+| FR-043 | The scene's text (copy §F.7) appears in beats (FR-063) once the oasis is visible. | No text is visible before the reveal is complete. |
 
 ### C.6 Final message
 
@@ -111,6 +111,11 @@ At any point she can play or pause the music with one control. She can scroll ba
 |---|---|---|
 | FR-060 | Metaphor and story lines are revealed **line by line**: each line rises from behind an invisible mask (≤ 100% of its own height) while fading in. They are staggered and slow, with no bounce. | Easing is from the approved set in UX-006. Stagger is 0.12–0.2 s per line. |
 | FR-061 | Splitting text for animation must not break screen-reader reading. | VoiceOver and NVDA read each line as one natural sentence, not word fragments. |
+| FR-063 | **Beats (CR-02).** Each scene's text is split into the owner's paragraphs ("beats"). In a held scene, exactly **one beat is on screen at a time**: it rises in line by line (FR-060), holds, then lifts away and fades as the next one rises. Each beat has its own stop (FR-100). | At each beat's stop, every line of that beat has opacity ≥ 0.95 and every line of the other beats ≤ 0.05. Scrolling back reverses the sequence. |
+| FR-064 | The last beat of a held scene stays until the scene leaves the screen. | At the end of the hold, the last beat is still fully visible. |
+| FR-065 | The opening story is not held (FR-003). Its beats are shown together, separated by paragraph space, revealed line by line on entry. | After the first step, every story line is visible. |
+| FR-066 | Without animation (reduced motion, script failure, static fallback), all beats of a scene are visible at once, stacked as paragraphs in reading order. Screen readers read a scene's beats as one heading, in order. | With reduced motion, every line of every beat has opacity 1 and no two beats overlap. Each heading's accessible name is the full text. |
+| FR-067 | Because only one beat is on screen, beats use a larger size than a whole block would: `clamp(1.5rem, 1rem + 2.2vw, 3rem)`. On narrow screens a long line wraps, balanced, instead of overflowing. | No horizontal overflow at 320 px. No beat overlaps the pearl or leaves the scrim area. |
 | FR-062 | Before scripts run, or if animation is disabled, all text is in its final, visible state. | With JS animations disabled or reduced motion on, every line is visible. No text has a starting state of `opacity: 0` in static CSS. |
 
 ### C.8 Audio (one track, hosted on the site, accepted risk R-06)
@@ -123,6 +128,9 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-073 | The audio state is clear: a still icon when paused, a softly moving icon when playing (static under reduced motion). `aria-pressed` and `aria-label` reflect the state ("Play music" / "Pause music"). | Inspection shows the correct attributes in both states. A screen reader announces the state change. |
 | FR-074 | Audio never blocks reading or scrolling, and no section starts or stops it automatically. | Scrolling through all sections while it plays doesn't interrupt it. Nothing other than the control changes playback. |
 | FR-075 | **Error handling:** if the file fails to load or play, the control shows that briefly and then hides itself. No error dialogs. | Simulated 404 on the track → no console error is surfaced to her and the control disappears gracefully. |
+| FR-077 | **Music hint (CR-02).** On the opening, a playful line invites her to start the music before scrolling: *"Psst… press play first"*, with a short pointer line toward the audio control. The control gently pulses while the hint shows. | Visible on first paint at 320 px and above, on the same row as the control, never overlapping it or the framing text. |
+| FR-078 | Pressing play changes the hint to *"Lovely. Now, scroll slowly."* and stops the pulse. If the music is unavailable, it reads *"Scroll slowly."* The hint never blocks scrolling, and nothing autoplays (FR-071 still holds). | After play, the hint is hidden and the follow-up line is visible; the pulse has stopped. Scrolling without playing works normally. |
+| FR-079 | The hint and the pulse leave with her first scroll or step (as FR-013) and do not come back. The hint is plain text, not a second control (FR-070). Under reduced motion the pulse is static. | After the first step the hint's opacity is < 0.1 and the control has no pulse; returning to the top does not bring them back. |
 | FR-076 | The file is served under a neutral path, e.g. `/audio/track.mp3`. | The built output contains no song title in any path. |
 
 ### C.9 Loading, failure and fallback
@@ -142,6 +150,18 @@ At any point she can play or pause the music with one control. She can scroll ba
 | FR-090 | With `prefers-reduced-motion: reduce`: no pins, no scroll-scrubbed transforms, no particles, no looping shimmer. Each scene is a static full-bleed composition in its *final* state (mountain lit, pearl luminous, oasis revealed), with all text visible. Rain becomes a still texture. Only short opacity crossfades are allowed. | With the OS setting on: ScrollTrigger creates no pins, no canvas is animating, and every scene is complete and readable in a normal scroll. |
 | FR-091 | Each image has a defined focal point for portrait crops (e.g. the lit summit stays in frame on a 390 px phone). The oasis uses a dedicated portrait crop when you supply one. | At 320, 375, 390 and 430 px the subject of each scene (summit, light shaft, oasis) is visible and not cut off. |
 | FR-092 | Mobile and desktop compositions are designed separately where needed (text position, size and alignment), not just scaled down. | Side-by-side review at 390 px and 1440 px shows a composition chosen for each. |
+
+### C.11 Stops and stepping (CR-02)
+
+| ID | Requirement | Acceptance criterion |
+|---|---|---|
+| FR-100 | **Stops**, in order: the opening framing (top), the opening story, one per mountain beat, one per pearl beat, one per oasis beat, and the message. With the approved copy that is 11 stops. | The test probe lists exactly these stops, in this order, at increasing scroll positions. |
+| FR-101 | **Quick transitions.** Each step is one eased scroll (`power2.inOut`) lasting 1.0–2.2 s, scaled to the distance. Moving between scenes crosses the colour zone and the scene entry within that single step. | A step between scenes takes ≤ 2.2 s; a step between beats takes ≥ 1.0 s. |
+| FR-102 | **One gesture, one step.** Input during a step is ignored, and the trailing momentum of a trackpad or wheel gesture never triggers a second step. A new gesture is needed. | A burst of 10 wheel events in 160 ms moves exactly one stop. |
+| FR-103 | **Keyboard.** ↓, PgDn and Space go forward; ↑, PgUp and Shift+Space go back; Home and End go to the first and last stop. With the audio button focused, Space and Enter operate the button, not the page. Keys with Ctrl, Alt or Meta pass through untouched. | Each key moves exactly one stop. Space on the focused button toggles the music and does not move the page. |
+| FR-104 | **Native scrolling is respected.** After a scrollbar drag, find-in-page or a screen reader moves the page, nothing snaps back; the next gesture goes to the nearest stop in its direction. | After `scrollTo` to a point between stops, one forward gesture lands on the first stop below that point. |
+| FR-105 | At the first stop, stepping back does nothing; at the message, stepping forward does nothing. No bounce, no wrap-around. | Gestures at either end leave the scroll position unchanged. |
+| FR-106 | With reduced motion, or if the scenes fail (static fallback), there is no stepping at all. | Under reduced motion, no input is intercepted. |
 
 ---
 
@@ -206,12 +226,12 @@ At any point she can play or pause the music with one control. She can scroll ba
 |---|---|---|
 | UX-001 | **Two type families:** *Cormorant Garamond* (serif) for the story, metaphor and final lines, and *Manrope* (sans) only for the small label, cue and accessible labels. Both self-hosted and subset. | Only these two families load. |
 | UX-002 | **Fluid editorial scale.** Metaphor lines are about 32 px at 320 px wide, growing to about 72 px on desktop. The final message is 22–34 px, upright (not italic) and at a reading size. The metaphor lines may use the italic. | Measured sizes at 320 and 1440 px. No overflow or broken words at 320 px. |
-| UX-003 | **Line length:** metaphor lines ≤ about 22 characters per line on mobile and ≤ about 28 on desktop. The final message column ≤ about 34 characters per line. Lines break by meaning, not by accident (set manually in the content file). | Visual review at all tested widths. |
+| UX-003 | **Line length:** lines break by meaning, set manually in the content file. Beat lines are ≤ about 45 characters; on narrow screens a line may wrap, balanced (FR-067). The final message column ≤ about 34 characters per line. | Visual review at all tested widths. |
 | UX-004 | **Palette:** each scene uses only its own palette from the brief. Background colours blend between scenes over ≥ 50% of a viewport height of scrolling. No neon, no purple or blue "AI" gradients, no glow beyond the pearl's halo. | Visual review. Sampled colours stay within the scene palettes. |
 | UX-005 | **Minimal UI:** the only controls are the audio button and the scroll cue at load. No cards, boxes, borders, carousels, arrows or dots. | Visual review. |
 | UX-006 | **Motion language:** slow and natural. Easing only from `power1`–`power3` (in, out or inOut), `sine` and `expo.out`, plus GSAP scroll smoothing for scrubbed timelines. **Never** `bounce`, `elastic` or `back`. No zoom beyond 1.06. Blur is static only, never animated. Timed tweens last 0.8–2.0 s. | Code review of all tween definitions. |
 | UX-007 | **Text lives in the landscape:** it sits directly on the image or scene, anchored to calm areas (sky, deep water, open sand), with only soft gradient scrims behind it. | Visual review. No containers behind text. |
-| UX-008 | **Whitespace and pacing:** generous margins (side gutter about 6 vw, at least 20 px). One idea per screen. The total page is about 9–10 viewport heights. | Measured page height. Visual review. |
+| UX-008 | **Whitespace and pacing:** generous margins (side gutter about 6 vw, at least 20 px). **One idea per screen: one beat per stop.** The story is about 11 stops long. | Stop count from the probe. Visual review. |
 | UX-009 | **The ending is visibly different:** the final section uses no imagery, effects, italics or decoration. The contrast with what came before is the point. | Visual review. |
 | UX-010 | **The scroll cue is quiet:** a short text hint (copy §F.7) and/or a 1 px line, about 60% opacity, slowly breathing (static under reduced motion). | Visual review. |
 
@@ -368,7 +388,7 @@ Every requirement above has its criterion inline. In Phase 6 each one becomes �
 - Analytics, cookies, storage, tracking, notifications, Vercel Analytics
 - Carpool or app notification visuals, Hopper branding, times, routes, places beyond "Kolkata"
 - Three.js / WebGL, Lenis or other smooth-scroll libraries, carousel or slider libraries, icon libraries
-- Horizontal page scrolling, scroll snap, full-page libraries
+- Horizontal page scrolling, CSS scroll snap, full-page libraries such as fullPage.js (stepping is built on the GSAP Observer that ScrollTrigger already ships, FR-002)
 - Video backgrounds, custom cursors, preloader or splash screens
 - Multiple tracks, playlists, a volume slider, track info
 - Light/dark theme switching (the site has its own fixed palettes)
@@ -411,10 +431,35 @@ The Task and Test columns are filled in during Phases 5 and 6.
 3. **Sign-off:** none, or your first name.
 4. **Fonts:** confirm Cormorant Garamond + Manrope (UX-001).
 
+## K. Change request CR-02 (v1.1): pacing, stepping and the music hint
+
+**Owner's request (2026-11-21):** the lines are long now, so show them with a better, never boring scroll reveal; move through the story section by section like fullPage.js, keeping the line reveals and every scene animation; on the first screen, playfully ask her to start the music before scrolling. The owner asked for the defaults below to be approved without a further round.
+
+**Approved copy (owner, replaces the ★ placeholders for these blocks).** Blank lines separate beats.
+
+| Block | Beats |
+|---|---|
+| Opening story | Kolkata. A rainy morning. ‖ The city was in no hurry. / Neither was I. ‖ It was an ordinary journey. / Or so I thought. |
+| Mountain | Somewhere between the road ahead / and the reflection behind me, / I caught my first glimpse of you. ‖ The world carried on. / Yet, for a moment, / everything else went quiet. ‖ Like sunlight finding a distant snowy peak, / something bright had found its way / into an ordinary morning. |
+| Pearl | Not everything beautiful seeks attention. ‖ Some things lie quietly beneath the surface, / waiting to be noticed. ‖ Like a pearl in the depths of the sea, / you can discover something rare / without ever looking for it. |
+| Oasis | The road went on. / The day went on. ‖ But some encounters are like finding an oasis / in a long stretch of desert— / brief, unexpected, / and remembered long after / you have walked away. |
+
+**Decisions taken by default**
+
+| # | Decision | Why |
+|---|---|---|
+| D-07 | Stepping is built on GSAP's Observer (inside ScrollTrigger) plus a tweened `window.scrollTo`, not fullPage.js. | fullPage.js needs a paid or GPL licence, adds ~40 KB and fights ScrollTrigger pins. This adds ~0 KB. |
+| D-08 | Held scenes show **one beat at a time** (replace, not accumulate). The opening shows its three short beats together. | Long text becomes a sequence of short, readable moments. The opening is not held (FR-003). |
+| D-09 | No automatic snapping after native scrolling (scrollbar, find-in-page, screen readers). | Pulling the page back against the reader is hostile and breaks assistive technology. |
+| D-10 | The music hint is an invitation, never a gate. No autoplay. | FR-071 and browser autoplay rules. |
+| D-11 | On phones, the page-level pinch zoom may be blocked while stepping is active, as with fullPage.js. Reduced-motion users get native scrolling. | Accepted as risk R-17. |
+| D-12 | Each held scene's scroll distance is derived from its timeline (0.4 viewport heights per timeline unit). | Adding or removing a beat in `copy.ts` re-paces the scene without code changes. |
+
 ## Accepted risks carried forward
 
 | ID | Risk | Status |
 |---|---|---|
 | R-06 | The hosted audio is a copyrighted film song at 32 kbps | Accepted by the owner (Q-04 → D) |
 | R-12 | The image licences in `public/` are unverified | Accepted by the owner (Q-12) |
+| R-17 | Stepping blocks page pinch-zoom on phones and is a stronger form of scroll control | Accepted (D-11). Reduced motion turns stepping off; desktop zoom still works. |
 | R-13 | The high-resolution oasis asset is pending, so a low-resolution placeholder is used until it arrives | Open: a dependency for Scope |

@@ -5,7 +5,7 @@
 | **Phase** | 3 of the HTD workflow (Scope) |
 | **Status** | Draft, waiting for owner approval |
 | **Version** | 0.1 · 2026-11-21 |
-| **Based on** | [01-FSD.md](01-FSD.md) v1.0 (approved) |
+| **Based on** | [01-FSD.md](01-FSD.md) v1.1 (approved, incl. CR-02) |
 
 ---
 
@@ -41,6 +41,10 @@ The MVP is not a reduced version of the experience. The FSD already describes th
 | WP-11 | **Responsive and accessibility pass:** separate mobile and desktop compositions, contrast scrims, focus states, screen-reader checks, 200% zoom | FR-092, NFR-010 to NFR-013, NFR-020 to NFR-024, UX-003, UX-005, UX-007, UX-008 | Medium |
 | WP-12 | **Verification and release prep:** Playwright tests (Chromium and WebKit), Lighthouse, axe, performance traces, the code review report, the test report, `vercel.json` (headers), the deployment guide | All tests, NFR-001 to NFR-004, NFR-043 | Medium |
 
+| WP-13 | **Story pacing (CR-02):** copy as beats, one beat at a time in held scenes, timelines with a label per beat, pin length derived from the timeline | FR-003, FR-024, FR-035, FR-043, FR-063 to FR-067, UX-003, UX-008 | Medium |
+| WP-14 | **Section stepping (CR-02):** stop registry, wheel/touch/keyboard stepping with one eased scroll per gesture, no stepping under reduced motion | FR-002, FR-100 to FR-106 | **High** |
+| WP-15 | **Music hint (CR-02):** playful hint and pointer on the opening, pulse on the control, follow-up line after play | FR-013, FR-077 to FR-079 | Low |
+
 Every FSD requirement maps to at least one work package. Nothing outside the FSD is included.
 
 ---
@@ -68,8 +72,8 @@ Carried over from FSD §H, and fixed for this project:
 - Forms, reply buttons, contact or social links, calls to action
 - Analytics, cookies, storage, tracking, Vercel Analytics and Speed Insights
 - Carpool or app UI, Hopper branding, times, routes or places other than "Kolkata"
-- Three.js / WebGL, Lenis, slider, carousel or full-page libraries, icon libraries
-- Horizontal page scrolling, scroll snap, scroll hijacking
+- Three.js / WebGL, Lenis, slider, carousel or full-page libraries (fullPage.js), icon libraries
+- Horizontal page scrolling, CSS scroll snap. *(Section stepping is now in scope: WP-14.)*
 - Video backgrounds, custom cursors, preloaders or splash screens
 - Multiple tracks, playlists, volume sliders, track metadata
 - Theme switching, a CMS, a backend or API, password protection, i18n
@@ -163,6 +167,8 @@ Carried over from FSD §H, and fixed for this project:
 | R-13 | Oasis asset delayed or off-style | Medium | High | The placeholder lets development continue. The release gate blocks sending without it. |
 | R-14 | The code-built pearl looks fake | Medium | High | Prototype the pearl early in WP-05 and get your visual sign-off before polishing the rest of the scene. |
 | R-15 | React 19 StrictMode double-mounting duplicates GSAP triggers | Medium | Medium | All animations created inside a context and reverted on unmount (NFR-042), with a test for leftover triggers. |
+| R-17 | Stepping blocks pinch-zoom on phones (D-11) | — | Medium | **Accepted.** Reduced motion turns stepping off. |
+| R-18 | Trackpad momentum causes double steps | Medium | Medium | Gesture-gap detection (FR-102) plus an automated burst test. |
 | R-16 | Version compatibility (Vite 8, Tailwind 4, React 19, GSAP 3) | Low | Medium | Versions pinned and checked in the Plan before installing. |
 
 ---

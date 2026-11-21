@@ -3,7 +3,8 @@ import { MessageBody } from './MessageBody'
 
 /** FR-083: the plain, effect-free version of the whole story. */
 export function StaticStory() {
-  const stanzas = [copy.opening.story, copy.mountain.lines, copy.pearl.lines, copy.oasis.lines]
+  // Every beat becomes its own stanza, in reading order (FR-066).
+  const stanzas = [copy.opening.story, copy.mountain.beats, copy.pearl.beats, copy.oasis.beats].flat()
   return (
     <main className="static-story">
       <h1 className="static-story__label">{copy.opening.label}</h1>

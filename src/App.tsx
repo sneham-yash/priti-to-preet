@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { AudioControl } from './components/AudioControl'
 import { ParticleField } from './components/ParticleField'
-import { ScrollTrigger } from './lib/gsap'
+import { gsap, ScrollTrigger } from './lib/gsap'
+import { enableSectionScroll } from './lib/sectionScroll'
 import { shouldForceFailure } from './lib/testHooks'
 import { FinalMessage } from './scenes/FinalMessage'
 import { MountainScene } from './scenes/MountainScene'
@@ -30,6 +31,13 @@ export function App() {
     return () => {
       cancelled = true
     }
+  }, [])
+
+  // FR-002 / FR-106: step through the stops only when motion is welcome.
+  useEffect(() => {
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => enableSectionScroll())
+    return () => mm.revert()
   }, [])
 
   return (

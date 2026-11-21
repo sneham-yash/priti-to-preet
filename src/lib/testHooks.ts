@@ -1,12 +1,14 @@
 import { snapshot } from './atmosphere'
 import { isAutomated } from './device'
 import { ScrollTrigger } from './gsap'
+import { listStops } from './stops'
 
 export interface TestProbe {
   scrollTrigger: typeof ScrollTrigger
   atmosphere: typeof snapshot
   particles: Record<string, number>
   particleLoopRunning: boolean
+  stops: typeof listStops
 }
 
 declare global {
@@ -23,6 +25,7 @@ export function installTestProbe(): void {
     atmosphere: snapshot,
     particles: {},
     particleLoopRunning: false,
+    stops: listStops,
   }
 }
 

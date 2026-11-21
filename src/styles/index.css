@@ -39,6 +39,9 @@
   --text-humour--line-height: 1.25;
   --text-display: clamp(1.75rem, 1.1rem + 3.7vw, 4rem);
   --text-display--line-height: 1.08;
+  /* FR-067: one beat on screen at a time, so it can be larger than a whole block. */
+  --text-beat: clamp(1.5rem, 1rem + 2.2vw, 3rem);
+  --text-beat--line-height: 1.14;
   --text-letter: clamp(1.45rem, 1.15rem + 1.15vw, 2.15rem);
   --text-letter--line-height: 1.45;
 

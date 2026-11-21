@@ -40,3 +40,17 @@
 | M2 | 13 | All scenes complete |
 | M3 | 17 | Feature complete |
 | M4 | 20 | MVP complete |
+
+## CR-02 tasks (approved with defaults, 2026-11-21)
+
+| Task | Title | Requirements | Depends on | Done when |
+|---|---|---|---|---|
+| TASK-21 | Update the docs (FSD v1.1, Scope, Plan, Tasks, Test Cases) | All CR-02 | — | Docs updated and marked approved |
+| TASK-22 | Write the CR-02 test cases as Playwright tests; run them and see them fail | FR-002, FR-063 to FR-067, FR-077 to FR-079, FR-100 to FR-106 | 21 | New tests fail for the right reason |
+| TASK-23 | Copy as beats; `Beats` component; static story | FR-063, FR-066, NFR-041 | 22 | Reduced-motion tests pass |
+| TASK-24 | `addBeats`, derived pin length, `onCleanup`; rebuild the three held timelines with labels | FR-003, FR-024, FR-035, FR-043, FR-063, FR-064 | 23 | Beat tests pass |
+| TASK-25 | Stop registry and section stepping | FR-002, FR-100 to FR-106 | 24 | Stepping tests pass |
+| TASK-26 | Music hint, pulse and cue states | FR-013, FR-077 to FR-079 | 22 | Hint tests pass |
+| TASK-27 | Full suite on all four browser projects; visual review at 390 and 1440 px | All | 23 to 26 | Suite green; screenshots reviewed |
+
+**Order:** 21 → 22 → 23 → 24 → 25 → 26 → 27.

@@ -10,7 +10,7 @@ test.describe('Structure & semantics', () => {
     await expect(page.locator('nav, header, footer')).toHaveCount(0)
   })
 
-  test('TC-002 native scrolling, no scroll-snap [FR-002]', async ({ page }) => {
+  test('TC-002 programmatic scrolling honoured, no CSS scroll-snap [FR-002]', async ({ page }) => {
     const snap = await page.evaluate(() =>
       Array.from(document.styleSheets).some((sheet) =>
         Array.from(sheet.cssRules).some((r) => r.cssText.includes('scroll-snap-type')),
@@ -21,12 +21,12 @@ test.describe('Structure & semantics', () => {
     expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(3000)
   })
 
-  test('TC-003 at most 3 pins, each ≤ 1.5 viewports [FR-003]', async ({ page }) => {
+  test('TC-003 at most 3 pins, each ≤ 2.5 viewports [FR-003]', async ({ page }) => {
     const list = await pins(page)
     const vh = await page.evaluate(() => innerHeight)
     expect(list.length).toBeLessThanOrEqual(3)
     expect(list.length).toBe(3)
-    for (const p of list) expect(p.end - p.start).toBeLessThanOrEqual(vh * 1.5 + 1)
+    for (const p of list) expect(p.end - p.start).toBeLessThanOrEqual(vh * 2.5 + 1)
   })
 
   test('TC-011 framing visible on first paint [FR-011]', async ({ page }) => {
@@ -50,9 +50,9 @@ test.describe('Structure & semantics', () => {
   })
 
   test('TC-061 revealed lines read as whole sentences [FR-061]', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'For a moment, everything else went quiet. Only the light on the snow.' })).toHaveCount(1)
-    await expect(page.getByRole('heading', { name: 'Not everything rare announces itself. Sometimes, you simply notice.' })).toHaveCount(1)
-    await expect(page.getByRole('heading', { name: /I wasn’t looking for anything\. That’s probably what made the moment feel different\./ })).toHaveCount(1)
+    await expect(page.getByRole('heading', { name: 'Somewhere between the road ahead and the reflection behind me, I caught my first glimpse of you. The world carried on. Yet, for a moment, everything else went quiet. Like sunlight finding a distant snowy peak, something bright had found its way into an ordinary morning.' })).toHaveCount(1)
+    await expect(page.getByRole('heading', { name: /^Not everything beautiful seeks attention\. Some things lie quietly beneath the surface, waiting to be noticed\./ })).toHaveCount(1)
+    await expect(page.getByRole('heading', { name: /^The road went on\. The day went on\. But some encounters are like finding an oasis/ })).toHaveCount(1)
   })
 
   test('TC-111 one h1, every section labelled by a heading [NFR-021]', async ({ page }) => {

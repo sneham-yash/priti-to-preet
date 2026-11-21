@@ -4,10 +4,14 @@ import { copy } from '../content/copy'
 import { useSceneAnimation, type SceneSetup } from '../hooks/useSceneAnimation'
 import { gsap } from '../lib/gsap'
 import { atmosphereHandOver } from '../lib/sceneTweens'
+import { registerStop } from '../lib/stops'
 
-const animateMessage: SceneSetup = ({ el }) => {
+const animateMessage: SceneSetup = ({ el, onCleanup }) => {
   // FR-050: the last of the weather settles before the words appear.
   atmosphereHandOver(el('.message__fade'), 'motes', null, 'bottom 40%')
+
+  // FR-100: the last stop.
+  onCleanup(registerStop('message', () => el('.letter').getBoundingClientRect().top + window.scrollY))
 
   // FR-052: the only motion here — one quiet opacity fade of the whole letter.
   const letter = el('.letter')

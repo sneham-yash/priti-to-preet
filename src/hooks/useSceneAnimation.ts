@@ -8,6 +8,8 @@ export interface SceneEnv {
   /** Scoped query that throws if the element is missing (catches markup drift early). */
   el: <T extends HTMLElement = HTMLElement>(selector: string) => T
   all: <T extends HTMLElement = HTMLElement>(selector: string) => T[]
+  /** Registers extra teardown (stops, classes) that runs when the animation is reverted. */
+  onCleanup: (fn: () => void) => void
 }
 
 /** May return a cleanup for anything the GSAP context cannot revert by itself. */
@@ -27,7 +29,12 @@ function build(scope: HTMLElement, setup: SceneSetup): gsap.MatchMedia {
       if (!found) throw new Error(`Scene element not found: ${selector}`)
       return found
     }
-    return setup({ scope, el, all })
+    const cleanups: (() => void)[] = []
+    const own = setup({ scope, el, all, onCleanup: (fn) => cleanups.push(fn) })
+    return () => {
+      own?.()
+      cleanups.forEach((fn) => fn())
+    }
   })
   return mm
 }
