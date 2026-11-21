@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+@import './scenes.css';
+
+/* ── Design tokens (UX-001, UX-002, UX-004, UX-006) ─────────────────────── */
+@theme {
+  --font-serif: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Rain / opening */
+  --color-rain-50: #e9eef2;
+  --color-rain-200: #b7c5d1;
+  --color-rain-500: #647585;
+  --color-rain-900: #263746;
+  /* Mountain */
+  --color-snow: #f5f8fc;
+  --color-ice: #d8e8f5;
+  --color-mist: #a8c4da;
+  --color-sun: #e8c98a;
+  /* Ocean / pearl */
+  --color-abyss: #071522;
+  --color-navy: #0d2b40;
+  --color-cyan: #3a718b;
+  --color-pearl: #e8eef1;
+  /* Desert / oasis */
+  --color-sand: #d8bd91;
+  --color-dune: #b99a6b;
+  --color-beige: #e9d9ba;
+  --color-olive: #536e5b;
+  --color-teal: #8fb9b1;
+  /* Final */
+  --color-ivory: #f6f3ed;
+  --color-ink: #252525;
+  --color-stone: #77736e;
+
+  /* Fluid editorial scale */
+  --text-label: 0.72rem;
+  --text-label--letter-spacing: 0.32em;
+  --text-humour: clamp(1.35rem, 1.05rem + 1.3vw, 2rem);
+  --text-humour--line-height: 1.25;
+  --text-display: clamp(1.75rem, 1.1rem + 3.7vw, 4rem);
+  --text-display--line-height: 1.08;
+  --text-letter: clamp(1.45rem, 1.15rem + 1.15vw, 2.15rem);
+  --text-letter--line-height: 1.45;
+
+  --ease-gentle: cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+:root {
+  --gutter: max(20px, 6vw);
+  --dur-slow: 1.6s;
+  --dur-med: 1s;
+  --dur-fast: 0.6s;
+  color-scheme: light;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+html {
+  background: var(--color-rain-900);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--color-rain-900);
+  color: var(--color-rain-50);
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(232 201 138 / 0.45);
+  color: inherit;
+}
+
+/* Visible focus on any background (NFR-022): light ring + dark halo. */
+:focus-visible {
+  outline: 2px solid var(--color-ivory);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--color-rain-900);
+}
+
+/* ── No-JS letter (FR-084) ──────────────────────────────────────────────── */
+.noscript-letter {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.1em;
+  padding: 15svh max(var(--gutter), calc((100% - 34ch) / 2));
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font: 500 1.6rem/1.45 var(--font-serif);
+}
+.noscript-letter p {
+  margin: 0;
+}
