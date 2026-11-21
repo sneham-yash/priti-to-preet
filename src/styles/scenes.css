@@ -35,9 +35,10 @@
   padding-inline: var(--gutter);
 }
 
+/* Kept short so there is little blank scrolling. The image edge masks (.fade-edges) lengthen each colour blend. */
 .approach {
   position: relative;
-  height: 60svh;
+  height: 30svh;
   overflow: hidden;
 }
 
@@ -124,8 +125,6 @@
   top: 0;
   height: 100vh;
   height: 100lvh;
-  margin-bottom: -100vh;
-  margin-bottom: -100lvh;
   overflow: hidden;
   background: linear-gradient(180deg, #1d2c39 0%, #263746 42%, #3b4c5c 100%);
 }
@@ -205,6 +204,13 @@
 .opening__intro {
   position: relative;
   z-index: 1;
+  /*
+   * The text is pulled up over the backdrop here, not with a negative margin on the backdrop.
+   * That keeps the backdrop's full height inside the section, so it scrolls away with it and its
+   * bottom colour meets the mountain approach without a seam.
+   */
+  margin-top: -100vh;
+  margin-top: -100lvh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -242,7 +248,7 @@
 .opening__story {
   position: relative;
   z-index: 1;
-  min-height: 85svh;
+  min-height: 65svh;
   display: flex;
   align-items: center;
   padding: 0 var(--gutter);
@@ -251,7 +257,11 @@
 /* ── 2 · Mountain ───────────────────────────────────────────────────────── */
 .approach--to-mountain {
   /* FR-020: through the rain clouds into clear, pale air. */
-  background: linear-gradient(180deg, #3b4c5c 0%, #647585 32%, #b7c5d1 66%, #e9eef2 100%);
+  /*
+   * Both ends match what is actually painted next to this strip: the opening backdrop's fog-lit
+   * bottom edge, and the mountain stage under its contrast scrim. No visible step at either edge.
+   */
+  background: linear-gradient(180deg, #425362 0%, #647585 32%, #b7c5d1 66%, #f0f4f8 100%);
 }
 .approach__cloud {
   position: absolute;
@@ -315,7 +325,7 @@
 /* ── 3 · Pearl ──────────────────────────────────────────────────────────── */
 .approach--to-ocean {
   /* FR-030: the light descends. */
-  height: 70svh;
+  height: 35svh;
   background: linear-gradient(180deg, #e9eef2 0%, #a8c4da 24%, #3a718b 54%, #0d2b40 80%, #0b2236 100%);
 }
 .pearl__stage {
@@ -432,8 +442,9 @@
 /* ── 4 · Oasis ──────────────────────────────────────────────────────────── */
 .approach--to-desert {
   /* FR-040: surfacing into warm light. */
-  height: 70svh;
-  background: linear-gradient(180deg, #0b2236 0%, #0d2b40 16%, #3a718b 44%, #8fb9b1 64%, #e9d9ba 88%, #e9d9ba 100%);
+  height: 35svh;
+  /* Starts at the vignetted edge of the pearl stage, not its base colour, so there is no step. */
+  background: linear-gradient(180deg, #061625 0%, #0d2b40 16%, #3a718b 44%, #8fb9b1 64%, #e9d9ba 88%, #e9d9ba 100%);
 }
 .oasis__stage,
 .oasis__base,
@@ -480,7 +491,7 @@
 }
 .message__fade {
   /* FR-050: the landscape gives way to plain paper. */
-  height: 50svh;
+  height: 30svh;
   background: linear-gradient(180deg, #d8bd91 0%, #e9d9ba 45%, #f6f3ed 100%);
 }
 .letter {

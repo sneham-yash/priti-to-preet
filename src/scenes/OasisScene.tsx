@@ -35,7 +35,7 @@ const animateOasis: SceneSetup = ({ scope, el, all }) => {
     feather.style.opacity = proxy.p >= 1 ? '0' : '1'
   }
 
-  const tl = pinnedTimeline(stage, 130)
+  const tl = pinnedTimeline(stage, 90)
   tl.fromTo(proxy, { p: 0 }, { p: 1, duration: 0.62, ease: 'sine.inOut', onUpdate: render, onStart: render }, 0)
   // FR-042: warm light drifts across the sand.
   tl.fromTo(el('.oasis__sweep'), { xPercent: -60, opacity: 0 }, { xPercent: 10, opacity: 1, duration: 0.35, ease: 'sine.inOut' }, 0.15)

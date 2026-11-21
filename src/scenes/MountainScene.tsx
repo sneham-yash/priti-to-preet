@@ -11,7 +11,7 @@ const animateMountain: SceneSetup = ({ scope, el, all }) => {
   // FR-020: rising out of the rain clouds — rain hands over to snow.
   atmosphereHandOver(el('.approach'), 'rain', 'snow')
 
-  const tl = pinnedTimeline(el('.stage'), 100)
+  const tl = pinnedTimeline(el('.stage'), 70)
   // FR-021: a gentle entry from the right; ≤ 6% travel, ≤ 1.06 scale, no gap at the edge.
   tl.fromTo(el('.mountain__image'), { xPercent: 2.8, scale: 1.06 }, { xPercent: 0, scale: 1, duration: 0.55 }, 0)
   // The mist parts…

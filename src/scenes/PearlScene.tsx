@@ -11,7 +11,7 @@ const animatePearl: SceneSetup = ({ scope, el, all }) => {
   // FR-030: the snowfall sinks and becomes suspended specks.
   atmosphereHandOver(el('.approach'), 'snow', 'specks')
 
-  const tl = pinnedTimeline(el('.stage'), 120)
+  const tl = pinnedTimeline(el('.stage'), 85)
   // FR-033 (1) the dark deepens
   tl.fromTo(el('.pearl__vignette'), { opacity: 0.35 }, { opacity: 1, duration: 0.3, ease: 'sine.inOut' }, 0)
   // (2) a shaft of light narrows toward it
