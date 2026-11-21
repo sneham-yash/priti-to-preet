@@ -397,7 +397,8 @@
   background: linear-gradient(180deg, #e9eef2 0%, #a8c4da 24%, #3a718b 54%, #0d2b40 80%, #0b2236 100%);
 }
 .pearl__stage {
-  --pearl-y: 54%;
+  /* Phones: the pearl sits higher so its words can sit well clear of the browser's bottom bar. */
+  --pearl-y: 38%;
   --pearl-size: min(22vmin, 180px);
   background: #0b2236;
 }
@@ -500,15 +501,25 @@
   border-radius: 50%;
   background: radial-gradient(ellipse 40% 20% at 50% 16%, rgb(255 255 255 / 0.5), transparent 72%);
 }
+/*
+ * Phones: anchored from the top, in svh. The stage is 100lvh tall, so anything measured from its
+ * bottom edge ends up behind the browser's bottom bar whenever that bar is showing.
+ */
 .pearl__text {
-  bottom: calc(9svh + env(safe-area-inset-bottom));
+  top: 54svh;
   left: 0;
   right: 0;
   text-align: center;
 }
-/* Beats of different lengths grow upward from the same baseline, away from the pearl. */
-.pearl__text .beats.is-sequenced > .beat {
-  align-self: end;
+/* Desktop: beats of different lengths grow upward from the same baseline, away from the pearl. */
+@media (min-width: 768px) {
+  .pearl__text {
+    top: auto;
+    bottom: 7svh;
+  }
+  .pearl__text .beats.is-sequenced > .beat {
+    align-self: end;
+  }
 }
 
 /* ── 4 · Oasis ──────────────────────────────────────────────────────────── */
@@ -746,9 +757,6 @@
   /* The oasis has a five-line beat: keep it in the sky, above the palms. */
   .oasis__text .beats {
     font-size: min(var(--text-beat), 2.5rem);
-  }
-  .pearl__text {
-    bottom: 7svh;
   }
 }
 
